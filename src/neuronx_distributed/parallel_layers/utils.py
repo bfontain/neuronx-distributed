@@ -151,11 +151,8 @@ def get_autocast_dtype():
 
 def disable_autocast():
     if torch.is_autocast_xla_enabled():
-        with torch.autocast('xla', enabled=False):
-            yield
-    else:
-        with torch.cuda.amp.autocast(enabled=False):
-            yield
+        return torch.autocast('xla', enabled=False)
+    return torch.cuda.amp.autocast(enabled=False)
 
 # Refering to https://github.com/NVIDIA/apex/blob/master/apex/_autocast_utils.py#L22
 def cast_if_autocast_enabled(*args):
@@ -224,11 +221,11 @@ def move_model_to_device(model: torch.nn.Module, device: torch.device) -> None:
 
 def verify_casted_dtype(value):
     """Veryfy whether the input values have been casted correctly"""
-    if not torch.is_autocast_enabled():
+    if not is_autocast_enabled():
         return
     else:
         if isinstance(value, torch.Tensor):
-            assert value.dtype == torch.get_autocast_gpu_dtype(), f"Datatype of tensor is expected to be {torch.get_autocast_gpu_dtype()}, got {value.dtype} instead"
+            assert value.dtype == get_autocast_dtype(), f"Datatype of tensor is expected to be {get_autocast_dtype()}, got {value.dtype} instead"
         elif isinstance(value, collections.abc.Mapping):
             for k, v in value.items():
                 verify_casted_dtype(k)
