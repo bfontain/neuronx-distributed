@@ -142,7 +142,7 @@ def cast_all(state, from_dtype=torch.float32, to_dtype=torch.bfloat16):
             return state
         
 def is_autocast_enabled():
-    return torch.is_auto_cast_enabled() or torch.is_autocast_xla_enabled()
+    return torch.is_autocast_enabled() or torch.is_autocast_xla_enabled()
 
 def get_autocast_dtype():
     if torch.is_autocast_xla_enabled():
