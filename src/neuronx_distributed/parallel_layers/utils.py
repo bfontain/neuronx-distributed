@@ -141,8 +141,8 @@ def cast_all(state, from_dtype=torch.float32, to_dtype=torch.bfloat16):
             # We only cast Tensor, list, tuple or dict of tensors.
             return state
         
-def is_auto_cast_enabled():
-    return torch.is_autocast_enabled() or torch.is_autocast_xla_enabled()
+def is_autocast_enabled():
+    return torch.is_auto_cast_enabled() or torch.is_autocast_xla_enabled()
 
 def get_autocast_dtype():
     if torch.is_autocast_xla_enabled():
@@ -156,7 +156,7 @@ def disable_autocast():
 
 # Refering to https://github.com/NVIDIA/apex/blob/master/apex/_autocast_utils.py#L22
 def cast_if_autocast_enabled(*args):
-    if not is_auto_cast_enabled():
+    if not is_autocast_enabled():
         return args
     else:
         return _cast(args, get_autocast_dtype())
