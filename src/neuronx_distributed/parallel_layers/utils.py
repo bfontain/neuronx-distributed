@@ -140,13 +140,29 @@ def cast_all(state, from_dtype=torch.float32, to_dtype=torch.bfloat16):
         else:
             # We only cast Tensor, list, tuple or dict of tensors.
             return state
+        
+def is_auto_cast_enabled():
+    return torch.is_autocast_enabled() or torch.is_autocast_xla_enabled()
+
+def get_autocast_dtype():
+    if torch.is_autocast_xla_enabled():
+        return torch.get_autocast_xla_dtype()    
+    return torch.get_autocast_gpu_dtype()
+
+def disable_autocast():
+    if torch.is_autocast_xla_enabled():
+        with torch.autocast('xla', enabled=False):
+            yield
+    else:
+        with torch.cuda.amp.autocast(enabled=False):
+            yield
 
 # Refering to https://github.com/NVIDIA/apex/blob/master/apex/_autocast_utils.py#L22
 def cast_if_autocast_enabled(*args):
-    if not torch.is_autocast_enabled():
+    if not is_auto_cast_enabled():
         return args
     else:
-        return _cast(args, torch.get_autocast_gpu_dtype())
+        return _cast(args, get_autocast_dtype())
 
 # Modifying from https://github.com/pytorch/pytorch/blob/main/torch/cuda/amp/autocast_mode.py#L57, removed check for cuda device
 def _cast(value, dtype):

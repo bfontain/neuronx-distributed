@@ -28,6 +28,7 @@ from .utils import (
     param_is_not_tensor_parallel_duplicate,
     set_tensor_model_parallel_attributes,
     verify_casted_dtype,
+    disable_autocast,
 )
 
 if "reduce_scatter_tensor" not in dir(torch.distributed):
@@ -349,7 +350,7 @@ def linear_with_async_allreduce(
         sequence_parallel_enabled,
     )
     verify_casted_dtype(args)
-    with torch.cuda.amp.autocast(enabled=False):
+    with disable_autocast():
         return LinearWithAsyncCommunication.apply(*args)
 
 

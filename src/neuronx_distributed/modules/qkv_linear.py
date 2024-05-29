@@ -21,6 +21,7 @@ from neuronx_distributed.parallel_layers.utils import (
     cast_if_autocast_enabled,
     set_tensor_model_parallel_attributes,
     verify_casted_dtype,
+    disable_autocast,
 )
 
 _KV_SHARED_GROUP = None
@@ -339,7 +340,7 @@ def gqa_qkv_linear_with_async_allreduce(
         kv_size_multiplier,
     )
     verify_casted_dtype(args)
-    with torch.cuda.amp.autocast(enabled=False):
+    with disable_autocast(enabled=False):
         return GQAQKVLinearWithAsyncCommunication.apply(*args)
 
 
